@@ -1,0 +1,110 @@
+package com.katalon.utils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.rauschig.jarchivelib.ArchiveFormat;
+import org.rauschig.jarchivelib.Archiver;
+import org.rauschig.jarchivelib.ArchiverFactory;
+import org.rauschig.jarchivelib.CompressionType;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
+
+class KatalonDownloadUtils {
+
+    private static final String RELEASES_LIST =
+            "https://raw.githubusercontent.com/katalon-studio/katalon-studio/master/releases.json";
+
+    static File getKatalonPackage(
+            Logger logger, String versionNumber)
+            throws IOException {
+
+        File katalonDir = getKatalonFolder(versionNumber);
+
+        Path fileLog = Paths.get(katalonDir.toString(), ".katalon.done");
+
+        if (fileLog.toFile().exists()) {
+            logger.info("Katalon Studio package has been downloaded already.");
+        } else {
+            org.apache.commons.io.FileUtils.deleteDirectory(katalonDir);
+
+            boolean katalonDirCreated = katalonDir.mkdirs();
+            if (!katalonDirCreated) {
+                throw new IllegalStateException("Cannot create directory to store Katalon Studio package.");
+            }
+
+            KatalonVersion version = getVersionInfo(logger, versionNumber);
+
+            String versionUrl = version.getUrl();
+
+            FileUtils.downloadAndExtract(logger, versionUrl, katalonDir);
+
+            boolean fileLogCreated = fileLog.toFile().createNewFile();
+            if (fileLogCreated) {
+                logger.info("Katalon Studio has been installed successfully.");
+            }
+        }
+
+        String[] childrenNames = katalonDir.list((dir, name) -> {
+            File file = new File(dir, name);
+            return file.isDirectory() && name.contains("Katalon");
+        });
+
+        String katalonContainingDirName = Arrays.stream(childrenNames).findFirst().get();
+
+
+        File katalonContainingDir = new File(katalonDir, katalonContainingDirName);
+
+        return katalonContainingDir;
+    }
+
+    private static File getKatalonFolder(String version) {
+        String path = System.getProperty("user.home");
+
+        Path p = Paths.get(path, ".katalon", version);
+        return p.toFile();
+    }
+
+    private static KatalonVersion getVersionInfo(Logger logger, String versionNumber) throws IOException {
+
+        URL url = new URL(RELEASES_LIST);
+
+        String os = OsUtils.getOSVersion(logger);
+
+        logger.info("Retrieve Katalon Studio version: " + versionNumber + ", OS: " + os);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<KatalonVersion> versions = objectMapper.readValue(url, new TypeReference<List<KatalonVersion>>() {
+        });
+
+        logger.info("Number of releases: " + versions.size());
+
+        for (KatalonVersion version : versions) {
+            if ((version.getVersion().equals(versionNumber)) && (version.getOs().equalsIgnoreCase(os))) {
+                String containingFolder = version.getContainingFolder();
+                if (containingFolder == null) {
+                    String fileName = version.getFilename();
+                    String fileExtension = "";
+                    if (fileName.endsWith(".zip")) {
+                        fileExtension = ".zip";
+                    } else if (fileName.endsWith(".tar.gz")) {
+                        fileExtension = ".tar.gz";
+                    }
+                    containingFolder = fileName.replace(fileExtension, "");
+                    version.setContainingFolder(containingFolder);
+                }
+                logger.info("Katalon Studio is hosted at " + version.getUrl() + ".");
+                return version;
+            }
+        }
+        return null;
+    }
+}
