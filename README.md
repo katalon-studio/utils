@@ -2,7 +2,7 @@
 
 Utilities to work with Katalon Studio
 
-```
+```java
     /**
      *
      * @param logger Logger to log activities.
