@@ -24,7 +24,7 @@ class OsUtils {
             try {
                 Process p = Runtime.getRuntime().exec("wmic os get osarchitecture");
                 try (InputStream inputStream = p.getInputStream()) {
-                    String output = IOUtils.toString(inputStream, Charset.defaultCharset());
+                    String output = IOUtils.toString(inputStream); // deprecated but compatible with commons-io 1.x
                     p.destroy();
 
                     if (output.contains("64")) {
