@@ -1,6 +1,18 @@
 # Katalon Utilities
 
-Utilities to work with Katalon Studio
+Utilities to work with Katalon Studio.
+
+## Install
+
+```xml
+<dependency>
+    <groupId>com.katalon</groupId>
+    <artifactId>utils</artifactId>
+    <version>1.0.2</version>
+</dependency>
+```
+
+## API
 
 ```java
     /**
