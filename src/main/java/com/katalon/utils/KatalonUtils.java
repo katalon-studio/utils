@@ -69,7 +69,7 @@ public class KatalonUtils {
             katalonDirPath = location;
         }
 
-        logger.info("Using Katalon Studio at " + katalonDirPath);
+        LogUtils.info(logger, "Using Katalon Studio at " + katalonDirPath);
         String katalonExecutableFile;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {

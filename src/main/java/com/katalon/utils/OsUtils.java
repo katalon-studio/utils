@@ -34,8 +34,8 @@ class OsUtils {
                     }
                 }
             } catch (Exception e) {
-                logger.info("Cannot detect the OS architecture. Assume it is x64.");
-                logger.info("Reason: " + e.getMessage() + ".");
+                LogUtils.info(logger, "Cannot detect the OS architecture. Assume it is x64.");
+                LogUtils.info(logger, "Reason: " + e.getMessage() + ".");
                 return "windows 64";
             }
 
@@ -68,7 +68,7 @@ class OsUtils {
             cmdarray = cmdlist.toArray(new String[]{});
         }
         Path workingDirectory = Files.createTempDirectory("katalon-");
-        logger.info("Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
+        LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
         Process cmdProc = Runtime.getRuntime().exec(cmdarray, null, workingDirectory.toFile());
         try (
                 BufferedReader stdoutReader = new BufferedReader(
@@ -81,7 +81,7 @@ class OsUtils {
             String line;
             while ((line = stdoutReader.readLine()) != null ||
                     (line = stderrReader.readLine()) != null) {
-                logger.info(line);
+                LogUtils.info(logger, line);
             }
         }
         cmdProc.waitFor();

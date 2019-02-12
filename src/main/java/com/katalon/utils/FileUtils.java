@@ -19,7 +19,7 @@ class FileUtils {
             Logger logger, String versionUrl, File targetDir)
             throws IOException {
 
-        logger.info("Downloading Katalon Studio from " + versionUrl + ". It may take a few minutes.");
+        LogUtils.info(logger, "Downloading Katalon Studio from " + versionUrl + ". It may take a few minutes.");
 
         URL url = new URL(versionUrl);
 

@@ -25,7 +25,7 @@ class KatalonDownloadUtils {
         Path fileLog = Paths.get(katalonDir.toString(), ".katalon.done");
 
         if (fileLog.toFile().exists()) {
-            logger.info("Katalon Studio package has been downloaded already.");
+            LogUtils.info(logger, "Katalon Studio package has been downloaded already.");
         } else {
             org.apache.commons.io.FileUtils.deleteDirectory(katalonDir);
 
@@ -42,7 +42,7 @@ class KatalonDownloadUtils {
 
             boolean fileLogCreated = fileLog.toFile().createNewFile();
             if (fileLogCreated) {
-                logger.info("Katalon Studio has been installed successfully.");
+                LogUtils.info(logger, "Katalon Studio has been installed successfully.");
             }
         }
 
@@ -72,13 +72,13 @@ class KatalonDownloadUtils {
 
         String os = OsUtils.getOSVersion(logger);
 
-        logger.info("Retrieve Katalon Studio version: " + versionNumber + ", OS: " + os);
+        LogUtils.info(logger, "Retrieve Katalon Studio version: " + versionNumber + ", OS: " + os);
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<KatalonVersion> versions = objectMapper.readValue(url, new TypeReference<List<KatalonVersion>>() {
         });
 
-        logger.info("Number of releases: " + versions.size());
+        LogUtils.info(logger, "Number of releases: " + versions.size());
 
         for (KatalonVersion version : versions) {
             if ((version.getVersion().equals(versionNumber)) && (version.getOs().equalsIgnoreCase(os))) {
@@ -94,7 +94,7 @@ class KatalonDownloadUtils {
                     containingFolder = fileName.replace(fileExtension, "");
                     version.setContainingFolder(containingFolder);
                 }
-                logger.info("Katalon Studio is hosted at " + version.getUrl() + ".");
+                LogUtils.info(logger, "Katalon Studio is hosted at " + version.getUrl() + ".");
                 return version;
             }
         }
