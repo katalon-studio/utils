@@ -94,6 +94,7 @@ class OsUtils {
     }
 
     static String[] getEnvironmentVariables() {
+        // Refer to https://docs.oracle.com/javase/7/docs/api/java/lang/Runtime.html#exec(java.lang.String[],%20java.lang.String[],%20java.io.File)
         return System.getenv().entrySet().stream().map(entry -> {
             return entry.getKey()+ "=" + entry.getValue();
         }).collect(Collectors.toList()).toArray(new String[]{});
