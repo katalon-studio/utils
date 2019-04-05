@@ -12,8 +12,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class OsUtils {
 
@@ -67,9 +69,12 @@ class OsUtils {
             List<String> cmdlist = Arrays.asList("sh", "-c", command);
             cmdarray = cmdlist.toArray(new String[]{});
         }
+
+        String[] envs = getEnvironmentVariables();
+
         Path workingDirectory = Files.createTempDirectory("katalon-");
         LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
-        Process cmdProc = Runtime.getRuntime().exec(cmdarray, null, workingDirectory.toFile());
+        Process cmdProc = Runtime.getRuntime().exec(cmdarray, envs, workingDirectory.toFile());
         try (
                 BufferedReader stdoutReader = new BufferedReader(
                         new InputStreamReader(
@@ -86,5 +91,11 @@ class OsUtils {
         }
         cmdProc.waitFor();
         return cmdProc.exitValue() == 0;
+    }
+
+    static String[] getEnvironmentVariables() {
+        return System.getenv().entrySet().stream().map(entry -> {
+            return entry.getKey()+ "=" + entry.getValue();
+        }).collect(Collectors.toList()).toArray(new String[]{});
     }
 }
