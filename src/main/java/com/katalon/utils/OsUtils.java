@@ -97,6 +97,11 @@ class OsUtils {
     }
 
     static String[] getEnvironmentVariables(Map<String, String> environmentVariablesMap) {
+
+        if(environmentVariablesMap == null) {
+            return new String[]{};
+        }
+
         return environmentVariablesMap.entrySet().stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.toList()).toArray(new String[]{});
