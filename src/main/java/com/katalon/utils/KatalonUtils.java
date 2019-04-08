@@ -71,8 +71,8 @@ public class KatalonUtils {
 
         LogUtils.info(logger, "Using Katalon Studio at " + katalonDirPath);
 
-        if(executeArgs.equals("")) {
-            LogUtils.info(logger, "No arguments to be run, no tests will be executed");
+        if (executeArgs.equals("")) {
+            LogUtils.info(logger, "Arguments are empty, no tests will be executed");
             return false;
         }
 
