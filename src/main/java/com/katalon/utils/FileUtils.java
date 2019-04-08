@@ -16,12 +16,12 @@ import java.nio.file.StandardCopyOption;
 class FileUtils {
 
     static void downloadAndExtract(
-            Logger logger, String versionUrl, File targetDir)
+            Logger logger, String fileUrl, File targetDir)
             throws IOException {
 
-        LogUtils.info(logger, "Downloading Katalon Studio from " + versionUrl + ". It may take a few minutes.");
+        LogUtils.info(logger, "Downloading Katalon Studio from " + fileUrl + ". It may take a few minutes.");
 
-        URL url = new URL(versionUrl);
+        URL url = new URL(fileUrl);
 
         try (InputStream inputStream = url.openStream()) {
             Path temporaryFile = Files.createTempFile("Katalon-", "");
@@ -31,9 +31,9 @@ class FileUtils {
                     StandardCopyOption.REPLACE_EXISTING);
 
             Archiver archiver;
-            if (versionUrl.contains(".zip")) {
+            if (fileUrl.contains(".zip")) {
                 archiver = ArchiverFactory.createArchiver(ArchiveFormat.ZIP);
-            } else if (versionUrl.contains(".tar.gz")) {
+            } else if (fileUrl.contains(".tar.gz")) {
                 archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR, CompressionType.GZIP);
             } else {
                 throw new IllegalStateException();

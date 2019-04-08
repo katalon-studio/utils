@@ -70,6 +70,12 @@ public class KatalonUtils {
         }
 
         LogUtils.info(logger, "Using Katalon Studio at " + katalonDirPath);
+
+        if (executeArgs.equals("")) {
+            LogUtils.info(logger, "Arguments are empty, no tests will be executed");
+            return false;
+        }
+
         String katalonExecutableFile;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {
