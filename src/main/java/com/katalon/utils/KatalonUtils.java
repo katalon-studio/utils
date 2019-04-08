@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class KatalonUtils {
 
@@ -14,7 +15,8 @@ public class KatalonUtils {
             String projectPath,
             String executeArgs,
             String x11Display,
-            String xvfbConfiguration)
+            String xvfbConfiguration,
+            Map<String, String> environmentVariablesMap)
             throws IOException, InterruptedException {
         File file = new File(katalonExecutableFile);
         if (!file.exists()) {
@@ -34,7 +36,7 @@ public class KatalonUtils {
         }
         command += " " + executeArgs + " ";
 
-        return OsUtils.runCommand(logger, command, x11Display, xvfbConfiguration);
+        return OsUtils.runCommand(logger, command, x11Display, xvfbConfiguration, environmentVariablesMap);
     }
 
     /**
@@ -57,7 +59,8 @@ public class KatalonUtils {
             String projectPath,
             String executeArgs,
             String x11Display,
-            String xvfbConfiguration)
+            String xvfbConfiguration,
+            Map<String, String> environmentVariablesMap)
             throws IOException, InterruptedException {
 
         String katalonDirPath;
@@ -93,6 +96,8 @@ public class KatalonUtils {
                 projectPath,
                 executeArgs,
                 x11Display,
-                xvfbConfiguration);
+                xvfbConfiguration,
+                environmentVariablesMap
+                );
     }
 }

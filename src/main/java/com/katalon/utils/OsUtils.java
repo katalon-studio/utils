@@ -15,7 +15,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class OsUtils {
 
@@ -53,7 +55,8 @@ class OsUtils {
             Logger logger,
             String command,
             String x11Display,
-            String xvfbConfiguration)
+            String xvfbConfiguration,
+            Map<String, String> environmentVariablesMap)
             throws IOException, InterruptedException {
 
         String[] cmdarray;
@@ -70,7 +73,7 @@ class OsUtils {
             cmdarray = cmdlist.toArray(new String[]{});
         }
 
-        String[] envs = getEnvironmentVariables();
+        String[] envs = getEnvironmentVariables(environmentVariablesMap);
 
         Path workingDirectory = Files.createTempDirectory("katalon-");
         LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
@@ -93,11 +96,14 @@ class OsUtils {
         return cmdProc.exitValue() == 0;
     }
 
-    static String[] getEnvironmentVariables() {
-        // Refer to https://docs.oracle.com/javase/7/docs/api/java/lang/Runtime.html#exec(java.lang.String[],%20java.lang.String[],%20java.io.File)
-        return System.getenv().entrySet().stream()
-                .map(entry -> entry.getKey()+ "=" + entry.getValue())
-                .collect(Collectors.toList())
-                .toArray(new String[]{});
+    static String[] getEnvironmentVariables(Map<String, String> environmentVariablesMap) {
+
+        if(environmentVariablesMap == null) {
+            return new String[]{};
+        }
+
+        return environmentVariablesMap.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.toList()).toArray(new String[]{});
     }
 }
