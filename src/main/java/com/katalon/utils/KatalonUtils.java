@@ -126,7 +126,7 @@ public class KatalonUtils {
 		LogUtils.info(logger, "Making driver executables...");
 		if (driverDirectoryPath != null) {
 			LogUtils.info(logger, "Drivers folder at: " + driverDirectoryPath.toAbsolutePath().toString());
-			Files.walk(driverDirectoryPath.toAbsolutePath()).filter(Files::isRegularFile).forEach(a -> {
+			Files.walk(driverDirectoryPath).filter(Files::isRegularFile).forEach(a -> {
 				LogUtils.info(logger, "Set " + a.getFileName().toString() + " as executable !");
 				a.toFile().setExecutable(true);
 			});
