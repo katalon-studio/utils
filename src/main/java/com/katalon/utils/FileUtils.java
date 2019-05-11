@@ -38,6 +38,7 @@ class FileUtils {
             } else {
                 throw new IllegalStateException();
             }
+            LogUtils.info(logger, "Extract " + temporaryFile.toString() + " to " + targetDir);
             archiver.extract(temporaryFile.toFile(), targetDir);
         }
     }
