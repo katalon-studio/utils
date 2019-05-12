@@ -43,7 +43,14 @@ public class KatalonUtils {
         }
         command += " " + executeArgs + " ";
 
-        return OsUtils.runCommand(logger, command, x11Display, xvfbConfiguration, environmentVariablesMap);
+        Path workingDirectory = Files.createTempDirectory("katalon-");
+        return OsUtils.runCommand(
+                logger,
+                command,
+                workingDirectory,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariablesMap);
     }
 
     /**

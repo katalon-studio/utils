@@ -18,7 +18,7 @@ class KatalonDownloadUtils {
 
     static File getKatalonPackage(
             Logger logger, String versionNumber)
-            throws IOException {
+            throws IOException, InterruptedException {
 
         File katalonDir = getKatalonFolder(versionNumber);
 

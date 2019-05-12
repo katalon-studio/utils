@@ -54,6 +54,7 @@ class OsUtils {
     static boolean runCommand(
             Logger logger,
             String command,
+            Path workingDirectory,
             String x11Display,
             String xvfbConfiguration,
             Map<String, String> environmentVariablesMap)
@@ -75,7 +76,6 @@ class OsUtils {
 
         String[] envs = getEnvironmentVariables(environmentVariablesMap);
 
-        Path workingDirectory = Files.createTempDirectory("katalon-");
         LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
         Process cmdProc = Runtime.getRuntime().exec(cmdarray, envs, workingDirectory.toFile());
         try (

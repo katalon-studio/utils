@@ -17,7 +17,7 @@ class FileUtils {
 
     static void downloadAndExtract(
             Logger logger, String fileUrl, File targetDir)
-            throws IOException {
+            throws IOException, InterruptedException {
 
         LogUtils.info(logger, "Downloading Katalon Studio from " + fileUrl + ". It may take a few minutes.");
 
@@ -30,16 +30,23 @@ class FileUtils {
                     temporaryFile,
                     StandardCopyOption.REPLACE_EXISTING);
 
-            Archiver archiver;
+            LogUtils.info(logger, "Extract " + temporaryFile.toString() + " to " + targetDir);
             if (fileUrl.contains(".zip")) {
-                archiver = ArchiverFactory.createArchiver(ArchiveFormat.ZIP);
+                Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.ZIP);
+                archiver.extract(temporaryFile.toFile(), targetDir);
             } else if (fileUrl.contains(".tar.gz")) {
-                archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR, CompressionType.GZIP);
+                // jarchivelib had bug
+                String command = "tar -xzf \"" + temporaryFile.toAbsolutePath() + "\"";
+                OsUtils.runCommand(
+                        logger,
+                        command,
+                        targetDir.toPath(),
+                        null,
+                        null,
+                        null);
             } else {
                 throw new IllegalStateException();
             }
-            LogUtils.info(logger, "Extract " + temporaryFile.toString() + " to " + targetDir);
-            archiver.extract(temporaryFile.toFile(), targetDir);
         }
     }
 
