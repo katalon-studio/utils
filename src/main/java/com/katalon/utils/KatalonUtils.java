@@ -1,18 +1,13 @@
 package com.katalon.utils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class KatalonUtils {
 
@@ -55,13 +50,15 @@ public class KatalonUtils {
 
     /**
      * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically.
-     * @param logger Logger to log activities.
-     * @param version Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
-     * @param location Local location where Katalon Studio has been pre-installed. If this argument is null or empty the package will be downloaded and installed automatically.
-     * @param projectPath Path to the Katalon Studio project to be executed. Ignored if provided by (@code executeArgs}.
-     * @param executeArgs Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is missing, the argument {@code projectPath} will be used.
-     * @param x11Display Linux only. This value will be used as the {@code DISPLAY} environment variable.
-     * @param xvfbConfiguration Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     *
+     * @param logger                  Logger to log activities.
+     * @param version                 Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location                Local location where Katalon Studio has been pre-installed. If this argument is null or empty the package will be downloaded and installed automatically.
+     * @param projectPath             Path to the Katalon Studio project to be executed. Ignored if provided by (@code executeArgs}.
+     * @param executeArgs             Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is missing, the argument {@code projectPath} will be used.
+     * @param x11Display              Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration       Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariablesMap Environment variables available when executing Katalon
      * @return true if the exit code is 0, false otherwise.
      * @throws IOException
      * @throws InterruptedException
@@ -104,8 +101,8 @@ public class KatalonUtils {
                     .toAbsolutePath()
                     .toString();
         }
-        makeDriversExecutable(katalonDirPath, logger);
-        
+        makeDriversExecutable(logger, katalonDirPath);
+
         return executeKatalon(
                 logger,
                 katalonExecutableFile,
@@ -114,32 +111,32 @@ public class KatalonUtils {
                 x11Display,
                 xvfbConfiguration,
                 environmentVariablesMap
-                );
+        );
     }
 
-	private static void makeDriversExecutable(String katalonDir, Logger logger)
-			throws IOException, InterruptedException {
+    private static void makeDriversExecutable(Logger logger, String katalonDir)
+            throws IOException {
 
-		Path driverDirectoryPath = null;
-		String os = OsUtils.getOSVersion(logger);
-		if (os.contains("macos")) {
-			driverDirectoryPath = Paths.get(katalonDir, "Contents", "Eclipse", "configuration", "resources", "drivers")
-					.toAbsolutePath();
-		} else {
-			driverDirectoryPath = Paths.get(katalonDir, "configuration", "resources", "drivers")
-					.toAbsolutePath();
-		}
+        Path driverDirectoryPath = null;
+        String os = OsUtils.getOSVersion(logger);
+        if (os.contains("macos")) {
+            driverDirectoryPath = Paths.get(katalonDir, "Contents", "Eclipse", "configuration", "resources", "drivers")
+                    .toAbsolutePath();
+        } else {
+            driverDirectoryPath = Paths.get(katalonDir, "configuration", "resources", "drivers")
+                    .toAbsolutePath();
+        }
 
-		LogUtils.info(logger, "Making driver executables...");
-		if (driverDirectoryPath != null) {
-			LogUtils.info(logger, "Drivers folder at: " + driverDirectoryPath.toAbsolutePath().toString());
-			Files.walk(driverDirectoryPath).filter(Files::isRegularFile).forEach(a -> {
-				LogUtils.info(logger, "Set " + a.getFileName().toString() + " as executable !");
-				a.toFile().setExecutable(true);
-			});
-		} else {
-			LogUtils.info(logger, " Could not find Drivers folder !");
-		}
+        LogUtils.info(logger, "Making driver executables...");
+        if (driverDirectoryPath != null) {
+            LogUtils.info(logger, "Drivers folder at: " + driverDirectoryPath.toAbsolutePath().toString());
+            Files.walk(driverDirectoryPath).filter(Files::isRegularFile).forEach(a -> {
+                LogUtils.info(logger, "Set " + a.getFileName().toString() + " as executable !");
+                a.toFile().setExecutable(true);
+            });
+        } else {
+            LogUtils.info(logger, " Could not find Drivers folder !");
+        }
 
-	}
+    }
 }
