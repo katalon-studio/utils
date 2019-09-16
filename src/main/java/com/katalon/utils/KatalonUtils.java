@@ -7,9 +7,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class KatalonUtils {
+    public static final String ARG_CONSOLE_LOG = "-consoleLog";
+    public static final String ARG_NO_EXIT = "-noExit";
+    private static final List<String> REMOVABLE_ARGS = Arrays.asList(
+            ARG_CONSOLE_LOG,
+            ARG_NO_EXIT
+    );
 
     private static boolean executeKatalon(
             Logger logger,
@@ -37,6 +45,10 @@ public class KatalonUtils {
             command += " -projectPath=\"" + projectPath + "\" ";
         }
         command += " " + executeArgs + " ";
+
+        // Remove removable arguments
+        command = REMOVABLE_ARGS.stream()
+                .reduce(command, (newCommand, arg) -> newCommand.replace(" " + arg, ""));
 
         Path workingDirectory = Files.createTempDirectory("katalon-");
         return OsUtils.runCommand(
