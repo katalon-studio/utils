@@ -105,11 +105,11 @@ public class KatalonUtils {
         String katalonExecutableFile;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {
-            katalonExecutableFile = Paths.get(katalonDirPath, "Contents", "MacOS", "katalon")
+            katalonExecutableFile = Paths.get(katalonDirPath, "Contents", "MacOS", "katalonc")
                     .toAbsolutePath()
                     .toString();
         } else {
-            katalonExecutableFile = Paths.get(katalonDirPath, "katalon")
+            katalonExecutableFile = Paths.get(katalonDirPath, "katalonc")
                     .toAbsolutePath()
                     .toString();
         }
