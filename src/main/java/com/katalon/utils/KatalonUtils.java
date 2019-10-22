@@ -38,9 +38,16 @@ public class KatalonUtils {
         if (katalonExecutableFile.contains(" ")) {
             katalonExecutableFile = "\"" + katalonExecutableFile + "\"";
         }
-        String command = katalonExecutableFile +
-                " -noSplash " +
-                " -runMode=console ";
+        String command = katalonExecutableFile;
+
+        if (!executeArgs.contains("-noSplash")) {
+            command += " -noSplash ";
+        }
+
+        if (!executeArgs.contains("-runMode=console")) {
+            command += " -runMode=console ";
+        }
+
         if (!executeArgs.contains("-projectPath")) {
             command += " -projectPath=\"" + projectPath + "\" ";
         }
