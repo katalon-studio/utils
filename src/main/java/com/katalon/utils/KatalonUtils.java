@@ -108,9 +108,12 @@ public class KatalonUtils {
         if (os.contains("macos")) {
             kataloncPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalonc");
             katalonPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalon");
-        } else {
+        } else if (os.contains("linux")) {
             kataloncPath = Paths.get(katalonDirPath, "katalonc");
             katalonPath = Paths.get(katalonDirPath, "katalon");
+        } else {
+            kataloncPath = Paths.get(katalonDirPath, "katalonc.exe");
+            katalonPath = Paths.get(katalonDirPath, "katalon.exe");
         }
 
         if (Files.exists(kataloncPath)) {
