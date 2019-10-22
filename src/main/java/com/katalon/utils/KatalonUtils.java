@@ -103,15 +103,20 @@ public class KatalonUtils {
         }
 
         String katalonExecutableFile;
+        Path katalonPath, kataloncPath;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {
-            katalonExecutableFile = Paths.get(katalonDirPath, "Contents", "MacOS", "katalonc")
-                    .toAbsolutePath()
-                    .toString();
+            kataloncPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalonc");
+            katalonPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalon");
         } else {
-            katalonExecutableFile = Paths.get(katalonDirPath, "katalonc")
-                    .toAbsolutePath()
-                    .toString();
+            kataloncPath = Paths.get(katalonDirPath, "katalonc");
+            katalonPath = Paths.get(katalonDirPath, "katalon");
+        }
+
+        if (Files.exists(kataloncPath)) {
+            katalonExecutableFile = kataloncPath.toAbsolutePath().toString();
+        } else {
+            katalonExecutableFile = katalonPath.toAbsolutePath().toString();
         }
         makeDriversExecutable(logger, katalonDirPath);
 
