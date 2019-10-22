@@ -74,36 +74,25 @@ class OsUtils {
             cmdarray = cmdlist.toArray(new String[]{});
         }
 
-        String[] envs = getEnvironmentVariables(environmentVariablesMap);
-
         LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
-        Process cmdProc = Runtime.getRuntime().exec(cmdarray, envs, workingDirectory.toFile());
+
+        ProcessBuilder pb = new ProcessBuilder(cmdarray);
+        Map<String, String> env = pb.environment();
+        env.putAll(environmentVariablesMap);
+        pb.directory(workingDirectory.toFile());
+        pb.redirectErrorStream(true);
+        Process cmdProc = pb.start();
         try (
                 BufferedReader stdoutReader = new BufferedReader(
                         new InputStreamReader(
                                 cmdProc.getInputStream(), StandardCharsets.UTF_8));
-                BufferedReader stderrReader = new BufferedReader(
-                        new InputStreamReader(
-                                cmdProc.getErrorStream(), StandardCharsets.UTF_8))
         ) {
             String line;
-            while ((line = stdoutReader.readLine()) != null ||
-                    (line = stderrReader.readLine()) != null) {
+            while ((line = stdoutReader.readLine()) != null) {
                 LogUtils.info(logger, line);
             }
         }
         cmdProc.waitFor();
         return cmdProc.exitValue() == 0;
-    }
-
-    static String[] getEnvironmentVariables(Map<String, String> environmentVariablesMap) {
-
-        if(environmentVariablesMap == null) {
-            return new String[]{};
-        }
-
-        return environmentVariablesMap.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.toList()).toArray(new String[]{});
     }
 }
