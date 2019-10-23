@@ -78,7 +78,9 @@ class OsUtils {
 
         ProcessBuilder pb = new ProcessBuilder(cmdarray);
         Map<String, String> env = pb.environment();
-        env.putAll(environmentVariablesMap);
+        if (environmentVariablesMap != null) {
+            env.putAll(environmentVariablesMap);
+        }
         pb.directory(workingDirectory.toFile());
         pb.redirectErrorStream(true);
         Process cmdProc = pb.start();
