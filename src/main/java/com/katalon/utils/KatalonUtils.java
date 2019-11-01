@@ -113,7 +113,7 @@ public class KatalonUtils {
         Path katalonPath, kataloncPath;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {
-            kataloncPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalonc");
+            kataloncPath = Paths.get(katalonDirPath, "Katalon Studio Engine.app", "Contents", "MacOS", "katalonc");
             katalonPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalon");
         } else if (os.contains("linux")) {
             kataloncPath = Paths.get(katalonDirPath, "katalonc");
