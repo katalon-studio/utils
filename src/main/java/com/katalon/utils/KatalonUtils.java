@@ -125,10 +125,11 @@ public class KatalonUtils {
 
         if (Files.exists(kataloncPath)) {
             katalonExecutableFile = kataloncPath.toAbsolutePath().toString();
+            makeDriversExecutable(logger, katalonDirPath, true);
         } else {
             katalonExecutableFile = katalonPath.toAbsolutePath().toString();
+            makeDriversExecutable(logger, katalonDirPath, false);
         }
-        makeDriversExecutable(logger, katalonDirPath);
 
         return executeKatalon(
                 logger,
@@ -141,14 +142,21 @@ public class KatalonUtils {
         );
     }
 
-    private static void makeDriversExecutable(Logger logger, String katalonDir)
+    private static void makeDriversExecutable(Logger logger, String katalonDir, boolean isKatalonc)
             throws IOException {
 
         Path driverDirectoryPath = null;
         String os = OsUtils.getOSVersion(logger);
         if (os.contains("macos")) {
-            driverDirectoryPath = Paths.get(katalonDir, "Contents", "Eclipse", "configuration", "resources", "drivers")
+            if (isKatalonc) {
+                driverDirectoryPath = Paths.get(katalonDir, "Katalon Studio Engine.app", "Contents", "Eclipse",
+                    "configuration", "resources", "drivers")
                     .toAbsolutePath();
+            } else {
+                driverDirectoryPath = Paths.get(katalonDir,  "Contents", "Eclipse",
+                    "configuration", "resources", "drivers")
+                    .toAbsolutePath();
+            }
         } else {
             driverDirectoryPath = Paths.get(katalonDir, "configuration", "resources", "drivers")
                     .toAbsolutePath();
