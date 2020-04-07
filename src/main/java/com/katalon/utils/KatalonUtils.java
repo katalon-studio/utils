@@ -68,7 +68,7 @@ public class KatalonUtils {
     }
 
     /**
-     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically.
+     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically in user's home.
      *
      * @param logger                  Logger to log activities.
      * @param version                 Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
@@ -92,11 +92,50 @@ public class KatalonUtils {
             String xvfbConfiguration,
             Map<String, String> environmentVariablesMap)
             throws IOException, InterruptedException {
+        return executeKatalon(
+                logger,
+                version,
+                location,
+                projectPath,
+                executeArgs,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariablesMap,
+                System.getenv("user.home"));
+    }
+
+    /**
+     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically.
+     *
+     * @param logger                  Logger to log activities.
+     * @param version                 Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location                Local location where Katalon Studio has been pre-installed. If this argument is null or empty the package will be downloaded and installed automatically.
+     * @param projectPath             Path to the Katalon Studio project to be executed. Ignored if provided by (@code executeArgs}.
+     * @param executeArgs             Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is missing, the argument {@code projectPath} will be used.
+     * @param x11Display              Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration       Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariablesMap Environment variables available when executing Katalon
+     * @param rootDir                 Directory to install Katalon Studio. Considered if {@code version} is provided.
+     * @return true if the exit code is 0, false otherwise.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static boolean executeKatalon(
+            Logger logger,
+            String version,
+            String location,
+            String projectPath,
+            String executeArgs,
+            String x11Display,
+            String xvfbConfiguration,
+            Map<String, String> environmentVariablesMap,
+            String rootDir)
+            throws IOException, InterruptedException {
 
         String katalonDirPath;
 
         if (StringUtils.isBlank(location)) {
-            File katalonDir = KatalonDownloadUtils.getKatalonPackage(logger, version);
+            File katalonDir = KatalonDownloadUtils.getKatalonPackage(logger, version, rootDir);
             katalonDirPath = katalonDir.getAbsolutePath();
         } else {
             katalonDirPath = location;
@@ -142,8 +181,7 @@ public class KatalonUtils {
         );
     }
 
-    private static void makeDriversExecutable(Logger logger, String katalonDir, boolean isKatalonc)
-            throws IOException {
+    private static void makeDriversExecutable(Logger logger, String katalonDir, boolean isKatalonc) throws IOException {
 
         Path driverDirectoryPath = null;
         String os = OsUtils.getOSVersion(logger);

@@ -3,7 +3,6 @@ package com.katalon.utils;
 import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
-import org.rauschig.jarchivelib.CompressionType;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-class FileUtils {
+public class FileUtils {
 
-    static void downloadAndExtract(
-            Logger logger, String fileUrl, File targetDir)
+    public static void downloadAndExtract(Logger logger, String fileUrl, File targetDir)
             throws IOException, InterruptedException {
 
         LogUtils.info(logger, "Downloading Katalon Studio from " + fileUrl + ". It may take a few minutes.");

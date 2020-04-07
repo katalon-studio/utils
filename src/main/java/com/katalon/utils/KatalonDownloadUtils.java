@@ -16,11 +16,10 @@ class KatalonDownloadUtils {
     private static final String RELEASES_LIST =
             "https://raw.githubusercontent.com/katalon-studio/katalon-studio/master/releases.json";
 
-    static File getKatalonPackage(
-            Logger logger, String versionNumber)
+    static File getKatalonPackage(Logger logger, String versionNumber, String rootDir)
             throws IOException, InterruptedException {
 
-        File katalonDir = getKatalonFolder(versionNumber);
+        File katalonDir = getKatalonFolder(versionNumber, rootDir);
 
         Path fileLog = Paths.get(katalonDir.toString(), ".katalon.done");
 
@@ -59,10 +58,8 @@ class KatalonDownloadUtils {
         return katalonContainingDir;
     }
 
-    private static File getKatalonFolder(String version) {
-        String path = System.getProperty("user.home");
-
-        Path p = Paths.get(path, ".katalon", version);
+    private static File getKatalonFolder(String version, String rootDir) {
+        Path p = Paths.get(rootDir, ".katalon", version);
         return p.toFile();
     }
 

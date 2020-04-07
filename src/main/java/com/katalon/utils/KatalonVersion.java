@@ -1,16 +1,12 @@
 package com.katalon.utils;
 
-class KatalonVersion {
+public class KatalonVersion {
 
     private String version;
     private String filename;
     private String os;
     private String url;
     private String containingFolder;
-
-    KatalonVersion() {
-
-    }
 
     public String getOs() {
         return os;
