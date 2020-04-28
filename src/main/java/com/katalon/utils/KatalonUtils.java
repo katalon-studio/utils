@@ -79,8 +79,8 @@ public class KatalonUtils {
      * @param xvfbConfiguration       Linux only. This value will be used as the arguments for {@code xvfb-run}.
      * @param environmentVariablesMap Environment variables available when executing Katalon
      * @return true if the exit code is 0, false otherwise.
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
      */
     public static boolean executeKatalon(
             Logger logger,
@@ -117,8 +117,8 @@ public class KatalonUtils {
      * @param environmentVariablesMap Environment variables available when executing Katalon
      * @param rootDir                 Directory to install Katalon Studio. Considered if {@code version} is provided.
      * @return true if the exit code is 0, false otherwise.
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
      */
     public static boolean executeKatalon(
             Logger logger,
