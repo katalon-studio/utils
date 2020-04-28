@@ -8,20 +8,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-class OsUtils {
+public class OsUtils {
 
-    static String getOSVersion(Logger logger) {
+    public static String getOSVersion(Logger logger) {
 
         if (SystemUtils.IS_OS_WINDOWS) {
 
@@ -51,7 +47,7 @@ class OsUtils {
         return "";
     }
 
-    static boolean runCommand(
+    public static boolean runCommand(
             Logger logger,
             String command,
             Path workingDirectory,
@@ -94,7 +90,9 @@ class OsUtils {
                 LogUtils.info(logger, line);
             }
         }
+
         cmdProc.waitFor();
+        LogUtils.info(logger, MessageFormat.format("Finished executing {0}. Exit code: {1}.", String.join(" ", cmdarray), cmdProc.exitValue()));
         return cmdProc.exitValue() == 0;
     }
 }

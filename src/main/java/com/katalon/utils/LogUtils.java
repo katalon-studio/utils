@@ -1,8 +1,8 @@
 package com.katalon.utils;
 
-class LogUtils {
+public class LogUtils {
 
-    static void info(Logger logger, String message) {
+    public static void info(Logger logger, String message) {
         if (logger == null) {
             logger = new ConsoleLogger();
         }
