@@ -101,7 +101,7 @@ public class KatalonUtils {
                 x11Display,
                 xvfbConfiguration,
                 environmentVariablesMap,
-                System.getenv("user.home"));
+                System.getProperty("user.home"));
     }
 
     /**
