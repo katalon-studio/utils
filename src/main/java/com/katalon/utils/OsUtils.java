@@ -1,19 +1,20 @@
 package com.katalon.utils;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 public class OsUtils {
 
@@ -24,7 +25,7 @@ public class OsUtils {
             try {
                 Process p = Runtime.getRuntime().exec("wmic os get osarchitecture");
                 try (InputStream inputStream = p.getInputStream()) {
-                    String output = IOUtils.toString(inputStream); // deprecated but compatible with commons-io 1.x
+                    String output = IOUtils.toString(inputStream, (Charset)null);
                     p.destroy();
 
                     if (output.contains("64")) {
