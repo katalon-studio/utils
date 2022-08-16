@@ -6,7 +6,7 @@
 
     <groupId>com.katalon</groupId>
     <artifactId>utils</artifactId>
-    <version>1.0.16</version>
+    <version>1.0.17</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,9 +40,8 @@
 
     <licenses>
         <license>
-            <name>License Agreement for Katalon Automation Framework</name>
-            <url>https://github.com/katalon-studio/utils/blob/master/LICENSE</url>
-            <distribution>repo</distribution>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
 
