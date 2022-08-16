@@ -8,7 +8,7 @@ Utilities to work with Katalon Studio.
 <dependency>
     <groupId>com.katalon</groupId>
     <artifactId>utils</artifactId>
-    <version>1.0.16</version>
+    <version>1.0.17</version>
 </dependency>
 ```
 
