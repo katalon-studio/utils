@@ -19,65 +19,19 @@ public class KatalonUtils {
             ARG_NO_EXIT
     );
 
-    private static boolean executeKatalon(
-            Logger logger,
-            String katalonExecutableFile,
-            String projectPath,
-            String executeArgs,
-            String x11Display,
-            String xvfbConfiguration,
-            Map<String, String> environmentVariablesMap)
-            throws IOException, InterruptedException {
-        File file = new File(katalonExecutableFile);
-        if (!file.exists()) {
-            file = new File(katalonExecutableFile + ".exe");
-        }
-        if (file.exists()) {
-            file.setExecutable(true);
-        }
-        if (katalonExecutableFile.contains(" ")) {
-            katalonExecutableFile = "\"" + katalonExecutableFile + "\"";
-        }
-        String command = katalonExecutableFile;
-
-        if (!executeArgs.contains("-noSplash")) {
-            command += " -noSplash ";
-        }
-
-        if (!executeArgs.contains("-runMode=console")) {
-            command += " -runMode=console ";
-        }
-
-        if (!executeArgs.contains("-projectPath")) {
-            command += " -projectPath=\"" + projectPath + "\" ";
-        }
-        command += " " + executeArgs + " ";
-
-        // Remove removable arguments
-        command = REMOVABLE_ARGS.stream()
-                .reduce(command, (newCommand, arg) -> newCommand.replace(" " + arg, ""));
-
-        Path workingDirectory = Files.createTempDirectory("katalon-");
-        return OsUtils.runCommand(
-                logger,
-                command,
-                workingDirectory,
-                x11Display,
-                xvfbConfiguration,
-                environmentVariablesMap);
-    }
-
     /**
-     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically in user's home.
-     *
-     * @param logger                  Logger to log activities.
-     * @param version                 Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
-     * @param location                Local location where Katalon Studio has been pre-installed. If this argument is null or empty the package will be downloaded and installed automatically.
-     * @param projectPath             Path to the Katalon Studio project to be executed. Ignored if provided by (@code executeArgs}.
-     * @param executeArgs             Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is missing, the argument {@code projectPath} will be used.
-     * @param x11Display              Linux only. This value will be used as the {@code DISPLAY} environment variable.
-     * @param xvfbConfiguration       Linux only. This value will be used as the arguments for {@code xvfb-run}.
-     * @param environmentVariablesMap Environment variables available when executing Katalon
+     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically in the user's
+     * home directory.
+     * @param logger Logger to log activities.
+     * @param version Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location Local location where Katalon Studio has been pre-installed. If this argument is null or empty,
+     *                the package will be downloaded and installed automatically.
+     * @param projectPath Path to the Katalon Studio project to be executed. Ignored if provided by {@code executeArgs}.
+     * @param executeArgs Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is
+     *                   missing, the argument {@code projectPath} will be used.
+     * @param x11Display Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariables Environment variables available when executing Katalon.
      * @return true if the exit code is 0, false otherwise.
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
@@ -90,8 +44,8 @@ public class KatalonUtils {
             String executeArgs,
             String x11Display,
             String xvfbConfiguration,
-            Map<String, String> environmentVariablesMap)
-            throws IOException, InterruptedException {
+            Map<String, String> environmentVariables
+    ) throws IOException, InterruptedException {
         return executeKatalon(
                 logger,
                 version,
@@ -100,22 +54,24 @@ public class KatalonUtils {
                 executeArgs,
                 x11Display,
                 xvfbConfiguration,
-                environmentVariablesMap,
-                System.getProperty("user.home"));
+                environmentVariables,
+                System.getProperty("user.home")
+        );
     }
 
     /**
      * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically.
-     *
-     * @param logger                  Logger to log activities.
-     * @param version                 Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
-     * @param location                Local location where Katalon Studio has been pre-installed. If this argument is null or empty the package will be downloaded and installed automatically.
-     * @param projectPath             Path to the Katalon Studio project to be executed. Ignored if provided by (@code executeArgs}.
-     * @param executeArgs             Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is missing, the argument {@code projectPath} will be used.
-     * @param x11Display              Linux only. This value will be used as the {@code DISPLAY} environment variable.
-     * @param xvfbConfiguration       Linux only. This value will be used as the arguments for {@code xvfb-run}.
-     * @param environmentVariablesMap Environment variables available when executing Katalon
-     * @param rootDir                 Directory to install Katalon Studio. Considered if {@code version} is provided.
+     * @param logger Logger to log activities.
+     * @param version Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location Local location where Katalon Studio has been pre-installed. If this argument is null or empty,
+     *                the package will be downloaded and installed automatically.
+     * @param projectPath Path to the Katalon Studio project to be executed. Ignored if provided by {@code executeArgs}.
+     * @param executeArgs Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is
+     *                   missing, the argument {@code projectPath} will be used.
+     * @param x11Display Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariables Environment variables available when executing Katalon.
+     * @param rootDir Directory to install Katalon Studio. Considered if {@code version} is provided.
      * @return true if the exit code is 0, false otherwise.
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
@@ -128,10 +84,123 @@ public class KatalonUtils {
             String executeArgs,
             String x11Display,
             String xvfbConfiguration,
-            Map<String, String> environmentVariablesMap,
+            Map<String, String> environmentVariables,
+            String rootDir
+    ) throws IOException, InterruptedException {
+
+        if (StringUtils.isBlank(executeArgs)) {
+            LogUtils.info(logger, "Arguments are blank, no tests will be executed");
+            return false;
+        }
+
+        String executableFile = prepareExecutable(logger, version, location, rootDir);
+        String command = generateCommand(executableFile, executeArgs, projectPath);
+        Path workingDirectory = Files.createTempDirectory("katalon-");
+
+        return OsUtils.runCommand(
+                logger,
+                command,
+                workingDirectory,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariables);
+    }
+
+    /**
+     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically in the user's
+     * home directory.
+     * @param logger Logger to log activities.
+     * @param version Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location Local location where Katalon Studio has been pre-installed. If this argument is null or empty,
+     *                the package will be downloaded and installed automatically.
+     * @param projectPath Path to the Katalon Studio project to be executed. Ignored if provided by {@code executeArgs}.
+     * @param executeArgs Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is
+     *                   missing, the argument {@code projectPath} will be used.
+     * @param x11Display Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariables Environment variables available when executing Katalon.
+     * @return The executed Katalon Studio process.
+     * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
+     */
+    public static Process executeKatalonProcess(
+            Logger logger,
+            String version,
+            String location,
+            String projectPath,
+            String executeArgs,
+            String x11Display,
+            String xvfbConfiguration,
+            Map<String, String> environmentVariables
+    ) throws IOException, InterruptedException {
+        return executeKatalonProcess(
+                logger,
+                version,
+                location,
+                projectPath,
+                executeArgs,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariables,
+                System.getProperty("user.home")
+        );
+    }
+
+    /**
+     * Execute Katalon Studio test projects. Katalon Studio can be downloaded and installed automatically.
+     * @param logger Logger to log activities.
+     * @param version Version of Katalon Studio to be installed. Ignored if {@code location} is provided.
+     * @param location Local location where Katalon Studio has been pre-installed. If this argument is null or empty,
+     *                the package will be downloaded and installed automatically.
+     * @param projectPath Path to the Katalon Studio project to be executed. Ignored if provided by {@code executeArgs}.
+     * @param executeArgs Arguments for Katalon Studio CLI, without {@code -runMode}. If {@code -projectPath} is
+     *                   missing, the argument {@code projectPath} will be used.
+     * @param x11Display Linux only. This value will be used as the {@code DISPLAY} environment variable.
+     * @param xvfbConfiguration Linux only. This value will be used as the arguments for {@code xvfb-run}.
+     * @param environmentVariables Environment variables available when executing Katalon.
+     * @param rootDir Directory to install Katalon Studio. Considered if {@code version} is provided.
+     * @return The executed Katalon Studio process.
+     * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
+     */
+    public static Process executeKatalonProcess(
+            Logger logger,
+            String version,
+            String location,
+            String projectPath,
+            String executeArgs,
+            String x11Display,
+            String xvfbConfiguration,
+            Map<String, String> environmentVariables,
             String rootDir)
             throws IOException, InterruptedException {
 
+        if (StringUtils.isBlank(executeArgs)) {
+            LogUtils.info(logger, "Arguments are blank, no tests will be executed");
+            return null;
+        }
+
+        String executableFile = prepareExecutable(logger, version, location, rootDir);
+        String command = generateCommand(executableFile, executeArgs, projectPath);
+        Path workingDirectory = Files.createTempDirectory("katalon-");
+
+        ProcessBuilder pb = OsUtils.buildProcess(
+                command,
+                workingDirectory,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariables);
+        LogUtils.info(logger, "Execute " + Arrays.toString(pb.command().toArray()) + " in " + workingDirectory);
+
+        return OsUtils.startProcess(pb, logger);
+    }
+
+    private static String prepareExecutable(
+            Logger logger,
+            String version,
+            String location,
+            String rootDir
+    ) throws IOException, InterruptedException {
         String katalonDirPath;
 
         if (StringUtils.isBlank(location)) {
@@ -143,14 +212,10 @@ public class KatalonUtils {
 
         LogUtils.info(logger, "Using Katalon Studio at " + katalonDirPath);
 
-        if (executeArgs.equals("")) {
-            LogUtils.info(logger, "Arguments are empty, no tests will be executed");
-            return false;
-        }
-
-        String katalonExecutableFile;
+        String executableFile;
         Path katalonPath, kataloncPath;
         String os = OsUtils.getOSVersion(logger);
+
         if (os.contains("macos")) {
             kataloncPath = Paths.get(katalonDirPath, "Katalon Studio Engine.app", "Contents", "MacOS", "katalonc");
             katalonPath = Paths.get(katalonDirPath, "Contents", "MacOS", "katalon");
@@ -163,22 +228,19 @@ public class KatalonUtils {
         }
 
         if (Files.exists(kataloncPath)) {
-            katalonExecutableFile = kataloncPath.toAbsolutePath().toString();
+            executableFile = kataloncPath.toAbsolutePath().toString();
             makeDriversExecutable(logger, katalonDirPath, true);
         } else {
-            katalonExecutableFile = katalonPath.toAbsolutePath().toString();
+            executableFile = katalonPath.toAbsolutePath().toString();
             makeDriversExecutable(logger, katalonDirPath, false);
         }
 
-        return executeKatalon(
-                logger,
-                katalonExecutableFile,
-                projectPath,
-                executeArgs,
-                x11Display,
-                xvfbConfiguration,
-                environmentVariablesMap
-        );
+        File file = new File(executableFile);
+        if (file.exists()) {
+            file.setExecutable(true);
+        }
+
+        return executableFile;
     }
 
     private static void makeDriversExecutable(Logger logger, String katalonDir, boolean isKatalonc) throws IOException {
@@ -201,15 +263,38 @@ public class KatalonUtils {
         }
 
         LogUtils.info(logger, "Making driver executables...");
-        if (driverDirectoryPath != null) {
-            LogUtils.info(logger, "Drivers folder at: " + driverDirectoryPath.toAbsolutePath().toString());
-            Files.walk(driverDirectoryPath).filter(Files::isRegularFile).forEach(a -> {
-                LogUtils.info(logger, "Set " + a.getFileName().toString() + " as executable !");
-                a.toFile().setExecutable(true);
-            });
-        } else {
-            LogUtils.info(logger, " Could not find Drivers folder !");
+        LogUtils.info(logger, "Drivers folder at: " + driverDirectoryPath.toAbsolutePath());
+        Files.walk(driverDirectoryPath).filter(Files::isRegularFile).forEach(a -> {
+            LogUtils.info(logger, "Set " + a.getFileName().toString() + " as executable !");
+            a.toFile().setExecutable(true);
+        });
+    }
+
+    private static String generateCommand(String executableFile, String arguments, String projectPath) {
+        if (executableFile.contains(" ")) {
+            executableFile = "\"" + executableFile + "\"";
         }
 
+        String command = executableFile;
+
+        if (!arguments.contains("-noSplash")) {
+            command += " -noSplash ";
+        }
+
+        if (!arguments.contains("-runMode=console")) {
+            command += " -runMode=console ";
+        }
+
+        if (!arguments.contains("-projectPath")) {
+            command += " -projectPath=\"" + projectPath + "\" ";
+        }
+
+        command += " " + arguments + " ";
+
+        // Remove removable arguments
+        command = REMOVABLE_ARGS.stream()
+                .reduce(command, (newCommand, arg) -> newCommand.replace(" " + arg, ""));
+
+        return command;
     }
 }

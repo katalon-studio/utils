@@ -6,24 +6,24 @@
 
     <groupId>com.katalon</groupId>
     <artifactId>utils</artifactId>
-    <version>1.0.18</version>
+    <version>1.1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
+        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+        <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 
-        <jackson.version>2.13.3</jackson.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version>
-        <jarchivelib.version>1.2.0</jarchivelib.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <jackson.version>2.22.1</jackson.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <compress4j.version>3.0.0</compress4j.version>
+        <commons-io.version>2.22.0</commons-io.version>
     </properties>
 
     <name>Katalon Utilities</name>
@@ -166,9 +166,9 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.rauschig</groupId>
-            <artifactId>jarchivelib</artifactId>
-            <version>${jarchivelib.version}</version>
+            <groupId>io.github.compress4j</groupId>
+            <artifactId>compress4j</artifactId>
+            <version>${compress4j.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -23,7 +23,7 @@ public class OsUtils {
         if (SystemUtils.IS_OS_WINDOWS) {
 
             try {
-                Process p = Runtime.getRuntime().exec("wmic os get osarchitecture");
+                Process p = Runtime.getRuntime().exec(new String[]{"wmic", "os", "get", "osarchitecture"});
                 try (InputStream inputStream = p.getInputStream()) {
                     String output = IOUtils.toString(inputStream, (Charset)null);
                     p.destroy();
@@ -54,12 +54,35 @@ public class OsUtils {
             Path workingDirectory,
             String x11Display,
             String xvfbConfiguration,
-            Map<String, String> environmentVariablesMap)
+            Map<String, String> environmentVariables)
             throws IOException, InterruptedException {
 
-        String[] cmdarray;
+        ProcessBuilder pb = buildProcess(
+                command,
+                workingDirectory,
+                x11Display,
+                xvfbConfiguration,
+                environmentVariables);
+        LogUtils.info(logger, "Execute " + Arrays.toString(pb.command().toArray()) + " in " + workingDirectory);
+
+        Process cmdProcess = startProcess(pb, logger);
+        cmdProcess.waitFor();
+
+        LogUtils.info(logger, MessageFormat.format("Finished executing {0}. Exit code: {1}.", String.join(" ", pb.command()), cmdProcess.exitValue()));
+        return cmdProcess.exitValue() == 0;
+    }
+
+    public static ProcessBuilder buildProcess(
+            String command,
+            Path workingDirectory,
+            String x11Display,
+            String xvfbConfiguration,
+            Map<String, String> environmentVariables) {
+
+        String[] commands;
+
         if (SystemUtils.IS_OS_WINDOWS) {
-            cmdarray = Arrays.asList("cmd", "/c", command).toArray(new String[]{});
+            commands = Arrays.asList("cmd", "/c", command).toArray(new String[]{});
         } else {
             if (!StringUtils.isBlank(x11Display)) {
                 command = "DISPLAY=" + x11Display + " " + command;
@@ -68,23 +91,29 @@ public class OsUtils {
                 command = "xvfb-run " + xvfbConfiguration + " " + command;
             }
             List<String> cmdlist = Arrays.asList("sh", "-c", command);
-            cmdarray = cmdlist.toArray(new String[]{});
+            commands = cmdlist.toArray(new String[]{});
         }
 
-        LogUtils.info(logger, "Execute " + Arrays.toString(cmdarray) + " in " + workingDirectory);
-
-        ProcessBuilder pb = new ProcessBuilder(cmdarray);
+        ProcessBuilder pb = new ProcessBuilder(commands);
         Map<String, String> env = pb.environment();
-        if (environmentVariablesMap != null) {
-            env.putAll(environmentVariablesMap);
+
+        if (environmentVariables != null) {
+            env.putAll(environmentVariables);
         }
+
         pb.directory(workingDirectory.toFile());
         pb.redirectErrorStream(true);
-        Process cmdProc = pb.start();
+
+        return pb;
+    }
+
+    public static Process startProcess(ProcessBuilder pb, Logger logger) throws IOException {
+        Process cmdProcess = pb.start();
+
         try (
                 BufferedReader stdoutReader = new BufferedReader(
                         new InputStreamReader(
-                                cmdProc.getInputStream(), StandardCharsets.UTF_8));
+                                cmdProcess.getInputStream(), StandardCharsets.UTF_8))
         ) {
             String line;
             while ((line = stdoutReader.readLine()) != null) {
@@ -92,8 +121,6 @@ public class OsUtils {
             }
         }
 
-        cmdProc.waitFor();
-        LogUtils.info(logger, MessageFormat.format("Finished executing {0}. Exit code: {1}.", String.join(" ", cmdarray), cmdProc.exitValue()));
-        return cmdProc.exitValue() == 0;
+        return cmdProcess;
     }
 }

@@ -13,8 +13,7 @@ import java.util.List;
 
 class KatalonDownloadUtils {
 
-    private static final String RELEASES_LIST =
-            "https://raw.githubusercontent.com/katalon-studio/katalon-studio/master/releases.json";
+    private static final String RELEASES_LIST = "https://download.katalon.com/katalon-studio/releases.json";
 
     static File getKatalonPackage(Logger logger, String versionNumber, String rootDir)
             throws IOException, InterruptedException {
@@ -34,6 +33,9 @@ class KatalonDownloadUtils {
             }
 
             KatalonVersion version = getVersionInfo(logger, versionNumber);
+            if (version == null) {
+                throw new IllegalStateException("Cannot find Katalon Studio version: " + versionNumber);
+            }
 
             String versionUrl = version.getUrl();
 
@@ -50,8 +52,8 @@ class KatalonDownloadUtils {
             return file.isDirectory() && name.contains("Katalon");
         });
 
-        String katalonContainingDirName = Arrays.stream(childrenNames).findFirst().get();
-
+        String katalonContainingDirName = Arrays.stream(childrenNames)
+                .findFirst().orElseThrow(() -> new IllegalStateException("Cannot find Katalon Studio directory."));
 
         File katalonContainingDir = new File(katalonDir, katalonContainingDirName);
 
